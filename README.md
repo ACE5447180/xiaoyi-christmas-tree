@@ -22,6 +22,7 @@
 - `index.html`：网页主文件
 - `heart-density.js`：爱心粒子轮廓数据
 - `audio/christmas.mp3`：背景音乐
+- `photos/`：小怡的 14 张预置照片
 - `preview.png`、`preview-heart.png`：预览图
 
 页面中的全部交互与粒子效果在浏览器本地运行。

@@ -603,7 +603,22 @@
             preload: {
                 autoScanLocal: false,
                 scanCount: 0,
-                images: []
+                images: [
+                    "./photos/xiaoyi-01.jpg",
+                    "./photos/xiaoyi-02.jpg",
+                    "./photos/xiaoyi-03.jpg",
+                    "./photos/xiaoyi-04.jpg",
+                    "./photos/xiaoyi-05.jpg",
+                    "./photos/xiaoyi-06.jpg",
+                    "./photos/xiaoyi-07.jpg",
+                    "./photos/xiaoyi-08.jpg",
+                    "./photos/xiaoyi-09.jpg",
+                    "./photos/xiaoyi-10.jpg",
+                    "./photos/xiaoyi-11.jpg",
+                    "./photos/xiaoyi-12.jpg",
+                    "./photos/xiaoyi-13.jpg",
+                    "./photos/xiaoyi-14.jpg"
+                ]
             }
         };
 
@@ -951,19 +966,16 @@
                 }
                 const lerpSpeed = (mode === 'FOCUS' && this.mesh === focusTargetMesh) ? 5.0 : 2.0;
                 this.mesh.position.lerp(target, lerpSpeed * dt);
-                if (mode === 'SCATTER') {
+                if (this.type === 'PHOTO') {
+                    this.mesh.lookAt(camera.position);
+                } else if (mode === 'SCATTER') {
                     this.mesh.rotation.x += this.spinSpeed.x * dt;
                     this.mesh.rotation.y += this.spinSpeed.y * dt;
                     this.mesh.rotation.z += this.spinSpeed.z * dt;
                 } else if (mode === 'TREE') {
-                    if (this.type === 'PHOTO') {
-                        this.mesh.lookAt(0, this.mesh.position.y, 0);
-                        this.mesh.rotateY(Math.PI);
-                    } else {
-                        this.mesh.rotation.x = THREE.MathUtils.lerp(this.mesh.rotation.x, 0, dt);
-                        this.mesh.rotation.z = THREE.MathUtils.lerp(this.mesh.rotation.z, 0, dt);
-                        this.mesh.rotation.y += 0.5 * dt;
-                    }
+                    this.mesh.rotation.x = THREE.MathUtils.lerp(this.mesh.rotation.x, 0, dt);
+                    this.mesh.rotation.z = THREE.MathUtils.lerp(this.mesh.rotation.z, 0, dt);
+                    this.mesh.rotation.y += 0.5 * dt;
                 }
                 if (mode === 'FOCUS' && this.mesh === focusTargetMesh) this.mesh.lookAt(camera.position);
                 let s = this.baseScale;
@@ -1399,7 +1411,7 @@
             const group = new THREE.Group();
             group.add(frame); group.add(photo);
             frame.scale.set(width/1.2, height/1.2, 1);
-            const s = 0.8; group.scale.set(s,s,s);
+            const s = 0.96; group.scale.set(s,s,s);
             photoMeshGroup.add(group);
             particleSystem.push(new Particle(group, 'PHOTO', false));
             updatePhotoLayout();
@@ -1429,6 +1441,20 @@
 // -->
         function loadPredefinedImages() {
             const loader = new THREE.TextureLoader();
+            CONFIG.preload.images.forEach((path) => {
+                loader.load(
+                    path,
+                    (texture) => {
+                        texture.colorSpace = THREE.SRGBColorSpace;
+                        texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+                        addPhotoToScene(texture);
+                    },
+                    undefined,
+                    (error) => {
+                        console.warn("Photo could not be loaded:", path, error);
+                    }
+                );
+            });
             if (CONFIG.preload.autoScanLocal) {
                 for (let i = 1; i <= CONFIG.preload.scanCount; i++) {
                     const pathJpg = `./images/(${i}).jpg`;
